@@ -2,6 +2,7 @@ package com.slackpricecheck.itad
 
 import dispatch._
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{Future}
 import play.api.libs.json._
 import com.netaporter.uri.dsl._
 
@@ -36,12 +37,12 @@ class ITAD(token: String) {
     }
   }
 
-  def getLowestPrice(gameName: String): Option[Price] = {
+  def getLowestPrice(gameName: String): Future[Price] = Future {
     val gamePlain = getPlain(gameName);
     if (gamePlain.isDefined) {
-      Some(lowestPrice(prices(gamePlain.get).get))
+      lowestPrice(prices(gamePlain.get).get)
     }else{
-      None
+      throw new Exception(s"No price found for $gameName")
     }
   }
 

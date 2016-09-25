@@ -9,12 +9,6 @@ import akka.actor.ActorSystem
 import com.slackpricecheck.itad._
 
 object Bot {
-  def apply(token:String): Bot = {
-    new Bot(token)
-  }
-}
-
-class Bot(token: String) {
     implicit val system = ActorSystem("slack")
     implicit val itad = ITAD(sys.env("ITAD_TOKEN"))
 
@@ -23,20 +17,30 @@ class Bot(token: String) {
     var selfId : String = _
 
 
-    def connect(): Unit = {
+    def connect(token: String): Unit = {
       client = SlackApiClient(token)
       rtmClient = SlackRtmClient(token)
       selfId = rtmClient.state.self.id;
     }
 
     def main(args: Array[String]): Unit ={
-      connect()
+      connect(sys.env("SLACK_TOKEN"))
       rtmClient.onMessage { message =>
         if (shouldRespond(message.text)){
           val game = message.text.replaceAll(s"<@$selfId>","").trim()
-          val lowest_price = itad.getLowestPrice(game).get
-          val lowest_price_fmt = "%1.2f" format lowest_price.price_new
-          rtmClient.sendMessage(message.channel, s"Found lowest price of $$${lowest_price_fmt} at ${lowest_price.shop.name}  (${lowest_price.url})")
+          val lowestPriceFuture = itad.getLowestPrice(game)
+
+          lowestPriceFuture onSuccess {
+            case price =>
+              val lowestPrice = price
+              val lowest_price_fmt = "%1.2f" format lowestPrice.price_new
+              rtmClient.sendMessage(message.channel, s"Found lowest price of $$${lowest_price_fmt} at ${lowestPrice.shop.name}  (${lowestPrice.url})")
+          }
+
+          lowestPriceFuture onFailure {
+            case exception =>
+              rtmClient.sendMessage(message.channel, s"Could not find lowest price for $game.")
+          }
         }
       }
     }
