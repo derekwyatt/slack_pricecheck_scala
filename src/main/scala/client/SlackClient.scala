@@ -1,6 +1,5 @@
 package com.pricecheck.client
 
-import slack.models.Message
 import slack.api.SlackApiClient
 import slack.rtm.SlackRtmClient
 import akka.actor.ActorSystem
@@ -31,4 +30,9 @@ class SlackClient extends Client {
   }
 
   def self(): String = selfId
+}
+
+class SlackMessage(message: slack.models.Message) extends Message {
+  val text: String = message.text
+  val origin: String = message.channel
 }
