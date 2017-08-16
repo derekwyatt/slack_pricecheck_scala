@@ -26,7 +26,9 @@ class SlackClient extends Client {
   }
 
   def onMessage(f: (Message) => Unit): Unit = {
-    rtmClient.onMessage(f)
+    rtmClient.onMessage( message => {
+      f(new SlackMessage(message))
+    })
   }
 
   def self(): String = selfId

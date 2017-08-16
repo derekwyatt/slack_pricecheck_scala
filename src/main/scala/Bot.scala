@@ -30,12 +30,12 @@ object Bot {
           case price =>
             val lowestPrice = price
             val lowest_price_fmt = "%1.2f" format lowestPrice.price_new
-            client.sendMessage(message.channel, s"Found lowest price of $$${lowest_price_fmt} at ${lowestPrice.shop.name}  (${lowestPrice.url})")
+            client.sendMessage(message.origin, s"Found lowest price of $$${lowest_price_fmt} at ${lowestPrice.shop.name}  (${lowestPrice.url})")
         }
 
         lowestPriceFuture onFailure {
           case exception =>
-            client.sendMessage(message.channel, s"Could not find lowest price for $game.")
+            client.sendMessage(message.origin, s"Could not find lowest price for $game.")
         }
       }
     }
