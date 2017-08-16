@@ -16,7 +16,6 @@ object Bot {
     var rtmClient : SlackRtmClient = _
     var selfId : String = _
 
-
     def connect(token: String): Unit = {
       client = SlackApiClient(token)
       rtmClient = SlackRtmClient(token)
