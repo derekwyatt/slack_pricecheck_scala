@@ -9,14 +9,15 @@ import com.slackpricecheck.itad._
 
 object Bot {
   implicit val system = ActorSystem("slack")
-  implicit val itad = ITAD(sys.env("ITAD_TOKEN"))
 
   var client: Client = _
+  var itad: ITAD = _
 
   var selfId: String = _
   def connect(): Unit = {
     client = new SlackClient()
     selfId = client.self()
+    itad = ITAD(sys.env("ITAD_TOKEN"))
   }
 
   def main(args: Array[String]): Unit ={
